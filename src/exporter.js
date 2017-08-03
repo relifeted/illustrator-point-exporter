@@ -68,10 +68,46 @@ Exporter.prototype.readLayers = function (object) {
             layerObject.paths = this.readLayerPaths(layer);
         }
 
+        // Check for cordinates
+        if (layer.groupItems.length > 0) {
+            layerObject.groupItems = this.readGroupItems(layer);
+        }
+
         layers.push(layerObject);
     }
 
     return layers;
+};
+
+/**
+ * Read each groupItems within a layer
+ *
+ * @param  {object} layer
+ * @return {array}
+ */
+Exporter.prototype.readGroupItems = function (layer) {
+    var groupItemsCount = layer.groupItems.length;
+    var groupItems = [];
+    var groupItem = {};
+    var i;
+
+    for (i = 0; i < groupItemsCount; i++) {
+        groupItem = layer.groupItems[i];
+
+        // Skip if locked or hidden
+        if (groupItem.locked || groupItem.hidden) continue;
+
+        groupItems.push({
+            name: groupItem.name || groupItem.typename,
+            height: groupItem.height,
+            width: groupItem.width,
+            left: groupItem.left,
+            top: groupItem.top,
+            position: groupItem.position
+        });
+    }
+
+    return groupItems;
 };
 
 /**
